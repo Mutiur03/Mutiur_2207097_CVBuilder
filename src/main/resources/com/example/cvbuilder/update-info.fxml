@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="Infinity" prefWidth="Infinity" style="-fx-background-color: #DBD9D9;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.cvbuilder.HelloController">
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: #FFFFFF;" BorderPane.alignment="CENTER">
+            <VBox spacing="20.0" style="-fx-background-color: #FFFFFF;">
+                <padding>
+                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                </padding>
+
+                <VBox spacing="10.0">
+                    <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Personal Information" />
+                    <GridPane hgap="10.0" vgap="10.0">
+                        <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="120.0" />
+                            <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="150.0" />
+                        </columnConstraints>
+
+                        <Label text="Full Name:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                        <TextField fx:id="fullNameField" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                        <VBox alignment="CENTER" spacing="5.0" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.rowSpan="4">
+                            <ImageView fx:id="imageSelect" fitHeight="120.0" fitWidth="120.0" pickOnBounds="true" preserveRatio="true" style="-fx-border-color: #ccc; -fx-border-width: 1;" />
+                            <Button mnemonicParsing="false" onAction="#imageChange" text="Choose Image" />
+                        </VBox>
+
+                        <Label text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                        <TextField fx:id="emailField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                        <Label text="Phone:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                        <TextField fx:id="phoneField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                        <Label text="Address:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                        <TextArea fx:id="addressField" prefHeight="60.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                    </GridPane>
+                </VBox>
+
+                <Separator />
+
+                <VBox spacing="10.0">
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Educational Qualifications" />
+                        <Button mnemonicParsing="false" onAction="#addEducation" text="+ Add Education" />
+                    </HBox>
+                    <VBox fx:id="eduBox" spacing="8.0" />
+                </VBox>
+
+                <Separator />
+
+                <VBox spacing="10.0">
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Work Experience" />
+                        <Button mnemonicParsing="false" onAction="#addExperience" text="+ Add Experience" />
+                    </HBox>
+                    <VBox fx:id="expBox" spacing="8.0" />
+                </VBox>
+
+                <Separator />
+
+                <VBox spacing="10.0">
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Projects" />
+                        <Button mnemonicParsing="false" onAction="#addProject" text="+ Add Project" />
+                    </HBox>
+                    <VBox fx:id="projBox" spacing="8.0" />
+                </VBox>
+
+                <Separator />
+
+                <VBox spacing="10.0">
+                    <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Skills" />
+                    <TextArea fx:id="skillsField" prefHeight="80.0" wrapText="true" />
+                </VBox>
+
+                <HBox alignment="CENTER" spacing="10.0">
+                    <padding>
+                        <Insets top="10.0" />
+                    </padding>
+                    <Button mnemonicParsing="false" onAction="#saveInformation" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;" text="Save Information" />
+                </HBox>
+            </VBox>
+        </ScrollPane>
+    </center>
+</BorderPane>
