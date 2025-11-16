@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.shape.Circle?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.example.cvbuilder.showCV"
+            prefWidth="900.0"
+            prefHeight="800.0"
+>
+    <ScrollPane fitToWidth="true"
+                AnchorPane.topAnchor="0"
+                AnchorPane.bottomAnchor="0"
+                AnchorPane.leftAnchor="0"
+                AnchorPane.rightAnchor="0">
+        <VBox spacing="24.0">
+            <padding>
+                <Insets top="32.0" right="32.0" bottom="32.0" left="32.0"/>
+            </padding>
+
+            <VBox  spacing="20.0">
+                <HBox spacing="24.0" alignment="CENTER_LEFT">
+                    <StackPane >
+                        <ImageView fx:id="profileImageView"
+                                   fitWidth="140.0"
+                                   fitHeight="140.0"
+                                   preserveRatio="true"
+                                   pickOnBounds="true">
+                            <clip>
+                                <Circle centerX="70" centerY="70" radius="70"/>
+                            </clip>
+                        </ImageView>
+                    </StackPane>
+
+                    <VBox spacing="12.0" alignment="CENTER_LEFT" VBox.vgrow="ALWAYS">
+                        <Label fx:id="nameLabel" />
+
+                        <VBox spacing="6.0">
+                            <HBox spacing="8.0" alignment="CENTER_LEFT">
+                                <Label text="✉" />
+                                <Label fx:id="emailLabel" />
+                            </HBox>
+                            <HBox spacing="8.0" alignment="CENTER_LEFT">
+                                <Label text="☎" />
+                                <Label fx:id="phoneLabel" />
+                            </HBox>
+                            <HBox spacing="8.0" alignment="CENTER_LEFT">
+                                <Label text="⌂" />
+                                <Label fx:id="addressLabel" wrapText="true"  maxWidth="550"/>
+                            </HBox>
+                        </VBox>
+                    </VBox>
+                </HBox>
+            </VBox>
+
+
+            <VBox  spacing="16.0">
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <Label text="🎓" />
+                    <Label text="Education" />
+                </HBox>
+                <VBox fx:id="educationVBox" spacing="12.0"/>
+            </VBox>
+
+            <VBox  spacing="16.0">
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <Label text="💼" />
+                    <Label text="Professional Experience" />
+                </HBox>
+                <VBox fx:id="experienceVBox" spacing="12.0"/>
+            </VBox>
+
+            <VBox  spacing="16.0">
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <Label text="🚀" />
+                    <Label text="Projects &amp; Achievements" />
+                </HBox>
+                <VBox fx:id="projectVBox" spacing="12.0"/>
+            </VBox>
+            <VBox spacing="16.0">
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <Label text="🛠" />
+                    <Label text="Skills" />
+                </HBox>
+                <Label fx:id="skillsLabel" wrapText="true" maxWidth="650"/>
+            </VBox>
+            <HBox spacing="16.0" alignment="CENTER">
+                <padding>
+                    <Insets top="16.0" right="0.0" bottom="16.0" left="0.0"/>
+                </padding>
+                <Button text="← Back to Editor" onAction="#goBack" />
+            </HBox>
+        </VBox>
+    </ScrollPane>
+</AnchorPane>

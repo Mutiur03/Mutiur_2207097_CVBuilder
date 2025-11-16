@@ -6,7 +6,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -129,14 +128,12 @@ public class HelloController {
                     }
                 }
             }
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("emni.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("CV.fxml"));
             Parent root = loader.load();
-
+            showCV cvController = loader.getController();
+            cvController.displayCV(cvData);
             Stage stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
-            Scene cvScene = new Scene(root);
-            stage.setScene(cvScene);
-            stage.setMaximized(true);
-            stage.setTitle("CV Preview");
+            SceneUtils.switchScene(stage, root, "CV Preview");
 
         } catch (Exception e) {
             System.err.println("Error while saving information and displaying CV: " + e.getMessage());
