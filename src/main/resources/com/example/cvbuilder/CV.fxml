@@ -45,11 +45,9 @@
                                 <Label fx:id="emailLabel" />
                             </HBox>
                             <HBox spacing="8.0" alignment="CENTER_LEFT">
-                                <Label text="☎" />
                                 <Label fx:id="phoneLabel" />
                             </HBox>
                             <HBox spacing="8.0" alignment="CENTER_LEFT">
-                                <Label text="⌂" />
                                 <Label fx:id="addressLabel" wrapText="true"  maxWidth="550"/>
                             </HBox>
                         </VBox>
@@ -60,7 +58,6 @@
 
             <VBox  spacing="16.0">
                 <HBox spacing="10.0" alignment="CENTER_LEFT">
-                    <Label text="🎓" />
                     <Label text="Education" />
                 </HBox>
                 <VBox fx:id="educationVBox" spacing="12.0"/>
@@ -68,7 +65,6 @@
 
             <VBox  spacing="16.0">
                 <HBox spacing="10.0" alignment="CENTER_LEFT">
-                    <Label text="💼" />
                     <Label text="Professional Experience" />
                 </HBox>
                 <VBox fx:id="experienceVBox" spacing="12.0"/>
@@ -76,14 +72,12 @@
 
             <VBox  spacing="16.0">
                 <HBox spacing="10.0" alignment="CENTER_LEFT">
-                    <Label text="🚀" />
                     <Label text="Projects &amp; Achievements" />
                 </HBox>
                 <VBox fx:id="projectVBox" spacing="12.0"/>
             </VBox>
             <VBox spacing="16.0">
                 <HBox spacing="10.0" alignment="CENTER_LEFT">
-                    <Label text="🛠" />
                     <Label text="Skills" />
                 </HBox>
                 <Label fx:id="skillsLabel" wrapText="true" maxWidth="650"/>
