@@ -11,8 +11,8 @@ public class CVData {
     private String address;
     private String skills;
     private Image profileImage;
-    private List<String> educationList;
-    private List<String> experienceList;
+    private List<Education> educationList;
+    private List<Experience> experienceList;
     private List<Project> projectList;
 
     public CVData() {
@@ -39,14 +39,52 @@ public class CVData {
     public Image getProfileImage() { return profileImage; }
     public void setProfileImage(Image profileImage) { this.profileImage = profileImage; }
 
-    public List<String> getEducationList() { return educationList; }
-    public void addEducation(String education) { this.educationList.add(education); }
+    public List<Education> getEducationList() { return educationList; }
+    public void addEducation(Education education) { this.educationList.add(education); }
 
-    public List<String> getExperienceList() { return experienceList; }
-    public void addExperience(String experience) { this.experienceList.add(experience); }
+    public List<Experience> getExperienceList() { return experienceList; }
+    public void addExperience(Experience experience) { this.experienceList.add(experience); }
 
     public List<Project> getProjectList() { return projectList; }
     public void addProject(Project project) { this.projectList.add(project); }
+
+    public static class Education {
+        private String school;
+        private String degree;
+        private String result;
+
+        public Education(String school, String degree, String result) {
+            this.school = school;
+            this.degree = degree;
+            this.result = result;
+        }
+
+        public String getSchool() { return school; }
+        public String getDegree() { return degree; }
+        public String getResult() { return result; }
+    }
+
+    public static class Experience {
+        private String jobTitle;
+        private String company;
+        private String startDate;
+        private String endDate;
+        private boolean currentlyWorking;
+
+        public Experience(String jobTitle, String company, String startDate, String endDate, boolean currentlyWorking) {
+            this.jobTitle = jobTitle;
+            this.company = company;
+            this.startDate = startDate;
+            this.endDate = endDate;
+            this.currentlyWorking = currentlyWorking;
+        }
+
+        public String getJobTitle() { return jobTitle; }
+        public String getCompany() { return company; }
+        public String getStartDate() { return startDate; }
+        public String getEndDate() { return endDate; }
+        public boolean isCurrentlyWorking() { return currentlyWorking; }
+    }
 
     public static class Project {
         private String title;

@@ -17,7 +17,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
 import java.io.File;
 import java.net.URL;
 import java.util.List;
@@ -70,14 +69,14 @@ public class HelloController implements Initializable {
     @FXML
     private void addEducation() {
         if (eduBox != null) {
-            eduBox.getChildren().add(createRemovableTextArea(eduBox, "Enter education details (e.g., Degree, Institution, Year)"));
+            eduBox.getChildren().add(createRemovableEducationFields(eduBox));
         }
     }
 
     @FXML
     private void addExperience() {
         if (expBox != null) {
-            expBox.getChildren().add(createRemovableTextArea(expBox, "Enter experience details (e.g., Position, Company, Duration)"));
+            expBox.getChildren().add(createRemovableExperienceFields(expBox));
         }
     }
 
@@ -88,24 +87,75 @@ public class HelloController implements Initializable {
         }
     }
 
-    private HBox createRemovableTextArea(VBox parent, String promptText) {
-        TextArea ta = new TextArea();
-        ta.setPrefRowCount(3);
-        ta.setPromptText(promptText);
-        HBox.setHgrow(ta, javafx.scene.layout.Priority.ALWAYS);
+    private VBox createRemovableEducationFields(VBox parent) {
+        VBox educationContainer = new VBox(8);
+        educationContainer.setStyle("-fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-padding: 10; -fx-background-color: #f9f9f9;");
 
-        Button removeBtn = new Button("Remove");
+        TextField schoolField = new TextField();
+        schoolField.setPromptText("School/College/University");
+        schoolField.setUserData("school");
+
+        TextField degreeField = new TextField();
+        degreeField.setPromptText("Degree");
+        degreeField.setUserData("degree");
+
+        TextField resultField = new TextField();
+        resultField.setPromptText("Result");
+        resultField.setUserData("result");
+
+        Button removeBtn = new Button("Remove Education");
         removeBtn.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
         removeBtn.setOnAction(e -> {
-            Node src = (Node) e.getSource();
-            Node p = src.getParent();
-            if (parent != null && p != null) {
-                parent.getChildren().remove(p);
+            if (parent != null) {
+                parent.getChildren().remove(educationContainer);
             }
         });
 
-        HBox container = new HBox(10, ta, removeBtn);
-        return container;
+        HBox buttonBox = new HBox(removeBtn);
+        buttonBox.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+
+        educationContainer.getChildren().addAll(schoolField, degreeField, resultField, buttonBox);
+        return educationContainer;
+    }
+
+    private VBox createRemovableExperienceFields(VBox parent) {
+        VBox experienceContainer = new VBox(8);
+        experienceContainer.setStyle("-fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-padding: 10; -fx-background-color: #f9f9f9;");
+        TextField jobTitleField = new TextField();
+        jobTitleField.setPromptText("Job Title");
+        jobTitleField.setUserData("jobTitle");
+        TextField companyField = new TextField();
+        companyField.setPromptText("Company Name");
+        companyField.setUserData("company");
+        TextField startDateField = new TextField();
+        startDateField.setPromptText("Start Date (e.g., Jan 2022)");
+        startDateField.setUserData("startDate");
+        TextField endDateField = new TextField();
+        endDateField.setPromptText("End Date (e.g., Nov 2025)");
+        endDateField.setUserData("endDate");
+        javafx.scene.control.CheckBox currentlyWorkingCheckBox = new javafx.scene.control.CheckBox("Currently working here");
+        currentlyWorkingCheckBox.setUserData("currentlyWorking");
+
+        currentlyWorkingCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal) {
+                endDateField.setDisable(true);
+                endDateField.clear();
+            } else {
+                endDateField.setDisable(false);
+            }
+        });
+        Button removeBtn = new Button("Remove Experience");
+        removeBtn.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
+        removeBtn.setOnAction(e -> {
+            if (parent != null) {
+                parent.getChildren().remove(experienceContainer);
+            }
+        });
+        HBox buttonBox = new HBox(removeBtn);
+        buttonBox.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+
+        experienceContainer.getChildren().addAll(jobTitleField, companyField, startDateField, endDateField, currentlyWorkingCheckBox, buttonBox);
+        return experienceContainer;
     }
 
     private VBox createRemovableProjectFields(VBox parent) {
@@ -159,8 +209,8 @@ public class HelloController implements Initializable {
                 cvData.setProfileImage(imageSelect.getImage());
             }
 
-            collectTextAreasFromBox(eduBox, cvData::addEducation);
-            collectTextAreasFromBox(expBox, cvData::addExperience);
+            collectEducationsFromBox(eduBox, cvData::addEducation);
+            collectExperiencesFromBox(expBox, cvData::addExperience);
             collectProjectsFromBox(projBox, cvData::addProject);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("CV.fxml"));
             Parent root = loader.load();
@@ -168,7 +218,11 @@ public class HelloController implements Initializable {
             cvController.displayCV(cvData);
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             SceneUtils.switchScene(stage, root, "CV Preview");
-
+            Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+            successAlert.setTitle("CV Ready");
+            successAlert.setHeaderText(null);
+            successAlert.setContentText("Your CV has been successfully generated!");
+            successAlert.showAndWait();
         } catch (Exception e) {
             System.err.println("Error while saving information and displaying CV: " + e.getMessage());
             e.printStackTrace();
@@ -190,24 +244,65 @@ public class HelloController implements Initializable {
         return (t != null && !t.trim().isEmpty()) ? t.trim() : null;
     }
 
-    private void collectTextAreasFromBox(VBox box, java.util.function.Consumer<String> consumer) {
+    private void collectEducationsFromBox(VBox box, java.util.function.Consumer<CVData.Education> consumer) {
         if (box == null || consumer == null) return;
         List<Node> children = box.getChildren();
         for (Node n : children) {
-            if (n instanceof HBox) {
-                HBox h = (HBox) n;
-                for (Node c : h.getChildren()) {
-                    if (c instanceof TextArea) {
-                        TextArea ta = (TextArea) c;
-                        if (ta.getText() != null && !ta.getText().trim().isEmpty()) {
-                            consumer.accept(ta.getText().trim());
+            if (n instanceof VBox educationVBox) {
+                String school = null;
+                String degree = null;
+                String result = null;
+
+                for (Node child : educationVBox.getChildren()) {
+                    if (child instanceof TextField tf) {
+                        if ("school".equals(tf.getUserData())) {
+                            school = tf.getText() != null && !tf.getText().trim().isEmpty() ? tf.getText().trim() : null;
+                        } else if ("degree".equals(tf.getUserData())) {
+                            degree = tf.getText() != null && !tf.getText().trim().isEmpty() ? tf.getText().trim() : null;
+                        } else if ("result".equals(tf.getUserData())) {
+                            result = tf.getText() != null && !tf.getText().trim().isEmpty() ? tf.getText().trim() : null;
                         }
                     }
                 }
-            } else if (n instanceof TextArea) {
-                TextArea ta = (TextArea) n;
-                if (ta.getText() != null && !ta.getText().trim().isEmpty()) {
-                    consumer.accept(ta.getText().trim());
+
+                if (school != null || degree != null || result != null) {
+                    consumer.accept(new CVData.Education(school, degree, result));
+                }
+            }
+        }
+    }
+
+    private void collectExperiencesFromBox(VBox box, java.util.function.Consumer<CVData.Experience> consumer) {
+        if (box == null || consumer == null) return;
+        List<Node> children = box.getChildren();
+        for (Node n : children) {
+            if (n instanceof VBox experienceVBox) {
+                String jobTitle = null;
+                String company = null;
+                String startDate = null;
+                String endDate = null;
+                boolean currentlyWorking = false;
+
+                for (Node child : experienceVBox.getChildren()) {
+                    if (child instanceof TextField tf) {
+                        if ("jobTitle".equals(tf.getUserData())) {
+                            jobTitle = tf.getText() != null && !tf.getText().trim().isEmpty() ? tf.getText().trim() : null;
+                        } else if ("company".equals(tf.getUserData())) {
+                            company = tf.getText() != null && !tf.getText().trim().isEmpty() ? tf.getText().trim() : null;
+                        } else if ("startDate".equals(tf.getUserData())) {
+                            startDate = tf.getText() != null && !tf.getText().trim().isEmpty() ? tf.getText().trim() : null;
+                        } else if ("endDate".equals(tf.getUserData())) {
+                            endDate = tf.getText() != null && !tf.getText().trim().isEmpty() ? tf.getText().trim() : null;
+                        }
+                    } else if (child instanceof javafx.scene.control.CheckBox cb) {
+                        if ("currentlyWorking".equals(cb.getUserData())) {
+                            currentlyWorking = cb.isSelected();
+                        }
+                    }
+                }
+
+                if (jobTitle != null || company != null || startDate != null) {
+                    consumer.accept(new CVData.Experience(jobTitle, company, startDate, endDate, currentlyWorking));
                 }
             }
         }
@@ -217,21 +312,18 @@ public class HelloController implements Initializable {
         if (box == null || consumer == null) return;
         List<Node> children = box.getChildren();
         for (Node n : children) {
-            if (n instanceof VBox) {
-                VBox projectVBox = (VBox) n;
+            if (n instanceof VBox projectVBox) {
                 String title = null;
                 String description = null;
                 String link = null;
                 for (Node child : projectVBox.getChildren()) {
-                    if (child instanceof TextField) {
-                        TextField tf = (TextField) child;
+                    if (child instanceof TextField tf) {
                         if ("title".equals(tf.getUserData())) {
                             title = tf.getText() != null && !tf.getText().trim().isEmpty() ? tf.getText().trim() : null;
                         } else if ("link".equals(tf.getUserData())) {
                             link = tf.getText() != null && !tf.getText().trim().isEmpty() ? tf.getText().trim() : null;
                         }
-                    } else if (child instanceof TextArea) {
-                        TextArea ta = (TextArea) child;
+                    } else if (child instanceof TextArea ta) {
                         if ("description".equals(ta.getUserData())) {
                             description = ta.getText() != null && !ta.getText().trim().isEmpty() ? ta.getText().trim() : null;
                         }
@@ -299,18 +391,23 @@ public class HelloController implements Initializable {
         if (box == null) return false;
         List<Node> children = box.getChildren();
         for (Node n : children) {
-            if (n instanceof HBox) {
-                HBox h = (HBox) n;
+            if (n instanceof VBox educationVBox) {
+                for (Node child : educationVBox.getChildren()) {
+                    if (child instanceof TextField tf) {
+                        if (tf.getText() != null && !tf.getText().trim().isEmpty()) {
+                            return true;
+                        }
+                    }
+                }
+            } else if (n instanceof HBox h) {
                 for (Node c : h.getChildren()) {
-                    if (c instanceof TextArea) {
-                        TextArea ta = (TextArea) c;
+                    if (c instanceof TextArea ta) {
                         if (ta.getText() != null && !ta.getText().trim().isEmpty()) {
                             return true;
                         }
                     }
                 }
-            } else if (n instanceof TextArea) {
-                TextArea ta = (TextArea) n;
+            } else if (n instanceof TextArea ta) {
                 if (ta.getText() != null && !ta.getText().trim().isEmpty()) {
                     return true;
                 }
@@ -324,18 +421,55 @@ public class HelloController implements Initializable {
         List<Node> children = box.getChildren();
 
         for (Node n : children) {
-            if (n instanceof HBox) {
-                HBox h = (HBox) n;
+            if ("education".equals(fieldType) && n instanceof VBox educationVBox) {
+                String school = null;
+                String degree = null;
+                String result = null;
+
+                for (Node child : educationVBox.getChildren()) {
+                    if (child instanceof TextField tf) {
+                        if ("school".equals(tf.getUserData())) {
+                            school = tf.getText() != null && !tf.getText().trim().isEmpty() ? tf.getText().trim() : null;
+                        } else if ("degree".equals(tf.getUserData())) {
+                            degree = tf.getText() != null && !tf.getText().trim().isEmpty() ? tf.getText().trim() : null;
+                        } else if ("result".equals(tf.getUserData())) {
+                            result = tf.getText() != null && !tf.getText().trim().isEmpty() ? tf.getText().trim() : null;
+                        }
+                    }
+                }
+
+                if (school == null && degree == null && result == null) {
+                    return true;
+                }
+            } else if ("experience".equals(fieldType) && n instanceof VBox experienceVBox) {
+                String jobTitle = null;
+                String company = null;
+                String startDate = null;
+
+                for (Node child : experienceVBox.getChildren()) {
+                    if (child instanceof TextField tf) {
+                        if ("jobTitle".equals(tf.getUserData())) {
+                            jobTitle = tf.getText() != null && !tf.getText().trim().isEmpty() ? tf.getText().trim() : null;
+                        } else if ("company".equals(tf.getUserData())) {
+                            company = tf.getText() != null && !tf.getText().trim().isEmpty() ? tf.getText().trim() : null;
+                        } else if ("startDate".equals(tf.getUserData())) {
+                            startDate = tf.getText() != null && !tf.getText().trim().isEmpty() ? tf.getText().trim() : null;
+                        }
+                    }
+                }
+
+                if (jobTitle == null || company == null || startDate == null) {
+                    return true;
+                }
+            } else if (n instanceof HBox h) {
                 for (Node c : h.getChildren()) {
-                    if (c instanceof TextArea) {
-                        TextArea ta = (TextArea) c;
+                    if (c instanceof TextArea ta) {
                         if (ta.getText() == null || ta.getText().trim().isEmpty()) {
                             return true;
                         }
                     }
                 }
-            } else if (n instanceof TextArea) {
-                TextArea ta = (TextArea) n;
+            } else if (n instanceof TextArea ta) {
                 if (ta.getText() == null || ta.getText().trim().isEmpty()) {
                     return true;
                 }
@@ -343,28 +477,24 @@ public class HelloController implements Initializable {
         }
         return false;
     }
-
     private boolean hasEmptyProjectFields(VBox box) {
         if (box == null) return false;
         List<Node> children = box.getChildren();
 
         for (Node n : children) {
-            if (n instanceof VBox) {
-                VBox projectVBox = (VBox) n;
+            if (n instanceof VBox projectVBox) {
                 String title = null;
                 String description = null;
                 boolean titleFieldExists = false;
                 boolean descFieldExists = false;
 
                 for (Node child : projectVBox.getChildren()) {
-                    if (child instanceof TextField) {
-                        TextField tf = (TextField) child;
+                    if (child instanceof TextField tf) {
                         if ("title".equals(tf.getUserData())) {
                             titleFieldExists = true;
                             title = tf.getText() != null && !tf.getText().trim().isEmpty() ? tf.getText().trim() : null;
                         }
-                    } else if (child instanceof TextArea) {
-                        TextArea ta = (TextArea) child;
+                    } else if (child instanceof TextArea ta) {
                         if ("description".equals(ta.getUserData())) {
                             descFieldExists = true;
                             description = ta.getText() != null && !ta.getText().trim().isEmpty() ? ta.getText().trim() : null;
@@ -379,10 +509,11 @@ public class HelloController implements Initializable {
         }
         return false;
     }
-
     private void showWarning(String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING, message, ButtonType.OK);
-        alert.setHeaderText("Invalid input");
+        alert.setTitle("Invalid input");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
         alert.showAndWait();
     }
 }

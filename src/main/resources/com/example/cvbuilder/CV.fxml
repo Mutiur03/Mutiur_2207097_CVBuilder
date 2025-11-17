@@ -11,82 +11,88 @@
             fx:controller="com.example.cvbuilder.showCV"
             prefWidth="900.0"
             prefHeight="800.0"
->
+            styleClass="root"
+            stylesheets="@CV.css">
+
     <ScrollPane fitToWidth="true"
                 AnchorPane.topAnchor="0"
                 AnchorPane.bottomAnchor="0"
                 AnchorPane.leftAnchor="0"
-                AnchorPane.rightAnchor="0">
-        <VBox spacing="24.0">
-            <padding>
-                <Insets top="32.0" right="32.0" bottom="32.0" left="32.0"/>
-            </padding>
+                AnchorPane.rightAnchor="0"
+                styleClass="scroll-pane">
 
-            <VBox  spacing="20.0">
-                <HBox spacing="24.0" alignment="CENTER_LEFT">
-                    <StackPane >
+        <VBox spacing="25" styleClass="root">
+            <padding>
+                <Insets top="40.0" right="60.0" bottom="40.0" left="60.0"/>
+            </padding>
+            <VBox styleClass="card">
+                <HBox spacing="30.0" alignment="CENTER_LEFT">
+                    <StackPane>
                         <ImageView fx:id="profileImageView"
-                                   fitWidth="140.0"
-                                   fitHeight="140.0"
+                                   fitWidth="120.0"
+                                   fitHeight="120.0"
                                    preserveRatio="true"
                                    pickOnBounds="true">
                             <clip>
-                                <Circle centerX="70" centerY="70" radius="70"/>
+                                <Circle centerX="60" centerY="60" radius="60"/>
                             </clip>
                         </ImageView>
                     </StackPane>
 
-                    <VBox spacing="12.0" alignment="CENTER_LEFT" VBox.vgrow="ALWAYS">
-                        <Label fx:id="nameLabel" />
+                    <VBox spacing="8.0" HBox.hgrow="ALWAYS">
+                        <Label fx:id="nameLabel" styleClass="name-label"/>
 
-                        <VBox spacing="6.0">
-                            <HBox spacing="8.0" alignment="CENTER_LEFT">
-                                <Label text="✉" />
-                                <Label fx:id="emailLabel" />
-                            </HBox>
-                            <HBox spacing="8.0" alignment="CENTER_LEFT">
-                                <Label fx:id="phoneLabel" />
-                            </HBox>
-                            <HBox spacing="8.0" alignment="CENTER_LEFT">
-                                <Label fx:id="addressLabel" wrapText="true"  maxWidth="550"/>
-                            </HBox>
-                        </VBox>
+                        <Separator prefHeight="2" styleClass="separator-primary">
+                            <VBox.margin>
+                                <Insets top="5.0" bottom="10.0"/>
+                            </VBox.margin>
+                        </Separator>
+
+                        <GridPane hgap="20.0" vgap="8.0">
+                            <columnConstraints>
+                                <ColumnConstraints hgrow="SOMETIMES" minWidth="40.0" prefWidth="100.0"/>
+                                <ColumnConstraints hgrow="ALWAYS" minWidth="100.0" prefWidth="400.0"/>
+                            </columnConstraints>
+
+                            <Label text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="0" styleClass="field-label"/>
+                            <Label fx:id="emailLabel" GridPane.columnIndex="1" GridPane.rowIndex="0" styleClass="value-normal"/>
+
+                            <Label text="Phone:" GridPane.columnIndex="0" GridPane.rowIndex="1" styleClass="field-label"/>
+                            <Label fx:id="phoneLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" styleClass="value-normal"/>
+
+                            <Label text="Address:" GridPane.columnIndex="0" GridPane.rowIndex="2" styleClass="field-label"/>
+                            <Label fx:id="addressLabel" GridPane.columnIndex="1" GridPane.rowIndex="2" wrapText="true" maxWidth="500" styleClass="value-normal"/>
+                        </GridPane>
                     </VBox>
                 </HBox>
             </VBox>
 
-
-            <VBox  spacing="16.0">
-                <HBox spacing="10.0" alignment="CENTER_LEFT">
-                    <Label text="Education" />
-                </HBox>
-                <VBox fx:id="educationVBox" spacing="12.0"/>
+            <VBox spacing="15.0" styleClass="card-small">
+                <Label text="Skills &amp; Competencies" styleClass="section-title"/>
+                <Separator styleClass="separator-secondary"/>
+                <Label fx:id="skillsLabel" wrapText="true" styleClass="value-description"/>
             </VBox>
 
-            <VBox  spacing="16.0">
-                <HBox spacing="10.0" alignment="CENTER_LEFT">
-                    <Label text="Professional Experience" />
-                </HBox>
-                <VBox fx:id="experienceVBox" spacing="12.0"/>
+            <VBox spacing="15.0" styleClass="card-small">
+                <Label text="Education" styleClass="section-title"/>
+                <Separator styleClass="separator-secondary"/>
+                <VBox fx:id="educationVBox" spacing="10.0"/>
             </VBox>
 
-            <VBox  spacing="16.0">
-                <HBox spacing="10.0" alignment="CENTER_LEFT">
-                    <Label text="Projects &amp; Achievements" />
-                </HBox>
-                <VBox fx:id="projectVBox" spacing="12.0"/>
+            <VBox spacing="15.0" styleClass="card-small">
+                <Label text="Professional Experience" styleClass="section-title"/>
+                <Separator styleClass="separator-secondary"/>
+                <VBox fx:id="experienceVBox" spacing="10.0"/>
             </VBox>
-            <VBox spacing="16.0">
-                <HBox spacing="10.0" alignment="CENTER_LEFT">
-                    <Label text="Skills" />
-                </HBox>
-                <Label fx:id="skillsLabel" wrapText="true" maxWidth="650"/>
+
+            <VBox spacing="15.0" styleClass="card-small">
+                <Label text="Projects &amp; Achievements" styleClass="section-title"/>
+                <Separator styleClass="separator-secondary"/>
+                <VBox fx:id="projectVBox" spacing="10.0"/>
             </VBox>
-            <HBox spacing="16.0" alignment="CENTER">
-                <padding>
-                    <Insets top="16.0" right="0.0" bottom="16.0" left="0.0"/>
-                </padding>
-                <Button text="← Back to Editor" onAction="#goBack" />
+
+            <HBox alignment="CENTER">
+                <Button text="← Back to Editor" onAction="#goBack" styleClass="back-button"/>
             </HBox>
         </VBox>
     </ScrollPane>
