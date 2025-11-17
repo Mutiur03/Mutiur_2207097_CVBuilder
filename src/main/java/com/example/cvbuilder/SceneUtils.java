@@ -6,7 +6,6 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 public final class SceneUtils {
-    private SceneUtils() {}
 
     public static void switchScene(Stage stage, Parent root, String title) {
         if (stage == null || root == null) return;

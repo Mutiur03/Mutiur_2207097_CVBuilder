@@ -43,7 +43,6 @@
                         <TextArea fx:id="addressField" prefHeight="60.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                     </GridPane>
                 </VBox>
-
                 <Separator />
 
                 <VBox spacing="10.0">
