@@ -13,7 +13,7 @@ public class CVData {
     private Image profileImage;
     private List<String> educationList;
     private List<String> experienceList;
-    private List<String> projectList;
+    private List<Project> projectList;
 
     public CVData() {
         this.educationList = new ArrayList<>();
@@ -45,6 +45,24 @@ public class CVData {
     public List<String> getExperienceList() { return experienceList; }
     public void addExperience(String experience) { this.experienceList.add(experience); }
 
-    public List<String> getProjectList() { return projectList; }
-    public void addProject(String project) { this.projectList.add(project); }
+    public List<Project> getProjectList() { return projectList; }
+    public void addProject(Project project) { this.projectList.add(project); }
+
+    public static class Project {
+        private String title;
+        private String description;
+        private String link;
+
+        public Project(String title, String description, String link) {
+            this.title = title;
+            this.description = description;
+            this.link = link;
+        }
+
+        public String getTitle() { return title; }
+
+        public String getDescription() { return description; }
+
+        public String getLink() { return link; }
+    }
 }

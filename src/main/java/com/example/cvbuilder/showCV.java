@@ -6,13 +6,16 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.awt.*;
 import java.io.IOException;
+import java.net.URI;
 
 public class showCV {
     @FXML
@@ -95,11 +98,39 @@ public class showCV {
         if (projectVBox != null) {
             projectVBox.getChildren().clear();
             if (cvData.getProjectList() != null && !cvData.getProjectList().isEmpty()) {
-                for (String proj : cvData.getProjectList()) {
-                    Text text = new Text(proj == null ? "" : proj);
-                    text.setWrappingWidth(650);
-                    text.setStyle("-fx-font-size: 13px; -fx-fill: #333;");
-                    projectVBox.getChildren().add(text);
+                for (CVData.Project proj : cvData.getProjectList()) {
+                    VBox projectContainer = new VBox(5);
+                    projectContainer.setStyle("-fx-padding: 8; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0; -fx-background-color: #fafafa;");
+
+                    if (proj.getTitle() != null && !proj.getTitle().trim().isEmpty()) {
+                        Text titleText = new Text(proj.getTitle());
+                        titleText.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-fill: #2c3e50;");
+                        projectContainer.getChildren().add(titleText);
+                    }
+
+                    if (proj.getDescription() != null && !proj.getDescription().trim().isEmpty()) {
+                        Text descText = new Text(proj.getDescription());
+                        descText.setWrappingWidth(650);
+                        descText.setStyle("-fx-font-size: 13px; -fx-fill: #333;");
+                        projectContainer.getChildren().add(descText);
+                    }
+
+                    if (proj.getLink() != null && !proj.getLink().trim().isEmpty()) {
+                        Hyperlink hyperlink = new Hyperlink(proj.getLink());
+                        hyperlink.setStyle("-fx-font-size: 12px; -fx-text-fill: #3498db;");
+
+                        hyperlink.setOnAction(event -> {
+                            try {
+                                Desktop.getDesktop().browse(new URI(proj.getLink()));
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        });
+
+                        projectContainer.getChildren().add(hyperlink);
+                    }
+
+                    projectVBox.getChildren().add(projectContainer);
                 }
             } else {
                 Text text = new Text("No project information provided.");

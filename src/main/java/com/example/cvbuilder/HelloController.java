@@ -4,7 +4,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
@@ -85,16 +84,14 @@ public class HelloController implements Initializable {
     @FXML
     private void addProject() {
         if (projBox != null) {
-            projBox.getChildren().add(createRemovableTextArea(projBox, "Enter project details (e.g., Project Name, Description, Technologies)"));
+            projBox.getChildren().add(createRemovableProjectFields(projBox));
         }
     }
 
     private HBox createRemovableTextArea(VBox parent, String promptText) {
         TextArea ta = new TextArea();
         ta.setPrefRowCount(3);
-        ta.setWrapText(true);
         ta.setPromptText(promptText);
-        ta.setStyle("-fx-border-color: #ddd; -fx-border-width: 1;");
         HBox.setHgrow(ta, javafx.scene.layout.Priority.ALWAYS);
 
         Button removeBtn = new Button("Remove");
@@ -108,9 +105,40 @@ public class HelloController implements Initializable {
         });
 
         HBox container = new HBox(10, ta, removeBtn);
-        container.setPadding(new Insets(5));
-        container.setStyle("-fx-background-color: #f9f9f9; -fx-border-color: #ddd; -fx-border-width: 1; -fx-border-radius: 5; -fx-background-radius: 5;");
         return container;
+    }
+
+    private VBox createRemovableProjectFields(VBox parent) {
+        VBox projectContainer = new VBox(8);
+        projectContainer.setStyle("-fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-padding: 10; -fx-background-color: #f9f9f9;");
+
+        TextField titleField = new TextField();
+        titleField.setPromptText("Project Title");
+        titleField.setUserData("title");
+
+        TextArea descArea = new TextArea();
+        descArea.setPrefRowCount(3);
+        descArea.setPromptText("Project Description");
+        descArea.setUserData("description");
+        VBox.setVgrow(descArea, javafx.scene.layout.Priority.ALWAYS);
+
+        TextField linkField = new TextField();
+        linkField.setPromptText("Project Link (Optional)");
+        linkField.setUserData("link");
+
+        Button removeBtn = new Button("Remove Project");
+        removeBtn.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
+        removeBtn.setOnAction(e -> {
+            if (parent != null) {
+                parent.getChildren().remove(projectContainer);
+            }
+        });
+
+        HBox buttonBox = new HBox(removeBtn);
+        buttonBox.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+
+        projectContainer.getChildren().addAll(titleField, descArea, linkField, buttonBox);
+        return projectContainer;
     }
 
     @FXML
@@ -133,7 +161,7 @@ public class HelloController implements Initializable {
 
             collectTextAreasFromBox(eduBox, cvData::addEducation);
             collectTextAreasFromBox(expBox, cvData::addExperience);
-            collectTextAreasFromBox(projBox, cvData::addProject);
+            collectProjectsFromBox(projBox, cvData::addProject);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("CV.fxml"));
             Parent root = loader.load();
             showCV cvController = loader.getController();
@@ -185,6 +213,37 @@ public class HelloController implements Initializable {
         }
     }
 
+    private void collectProjectsFromBox(VBox box, java.util.function.Consumer<CVData.Project> consumer) {
+        if (box == null || consumer == null) return;
+        List<Node> children = box.getChildren();
+        for (Node n : children) {
+            if (n instanceof VBox) {
+                VBox projectVBox = (VBox) n;
+                String title = null;
+                String description = null;
+                String link = null;
+                for (Node child : projectVBox.getChildren()) {
+                    if (child instanceof TextField) {
+                        TextField tf = (TextField) child;
+                        if ("title".equals(tf.getUserData())) {
+                            title = tf.getText() != null && !tf.getText().trim().isEmpty() ? tf.getText().trim() : null;
+                        } else if ("link".equals(tf.getUserData())) {
+                            link = tf.getText() != null && !tf.getText().trim().isEmpty() ? tf.getText().trim() : null;
+                        }
+                    } else if (child instanceof TextArea) {
+                        TextArea ta = (TextArea) child;
+                        if ("description".equals(ta.getUserData())) {
+                            description = ta.getText() != null && !ta.getText().trim().isEmpty() ? ta.getText().trim() : null;
+                        }
+                    }
+                }
+                if (title != null || description != null) {
+                    consumer.accept(new CVData.Project(title, description, link));
+                }
+            }
+        }
+    }
+
     private boolean validateInputs() {
         String name = (fullNameField != null) ? fullNameField.getText() : null;
         String email = (emailField != null) ? emailField.getText() : null;
@@ -217,6 +276,22 @@ public class HelloController implements Initializable {
             showWarning("At least one education entry is required.");
             return false;
         }
+
+        if (hasEmptyFields(eduBox, "education")) {
+            showWarning("Please fill in all education fields or remove empty ones.");
+            return false;
+        }
+
+        if (hasEmptyFields(expBox, "experience")) {
+            showWarning("Please fill in all experience fields or remove empty ones.");
+            return false;
+        }
+
+        if (hasEmptyProjectFields(projBox)) {
+            showWarning("Please fill in all project fields or remove empty ones.");
+            return false;
+        }
+
         return true;
     }
 
@@ -237,6 +312,67 @@ public class HelloController implements Initializable {
             } else if (n instanceof TextArea) {
                 TextArea ta = (TextArea) n;
                 if (ta.getText() != null && !ta.getText().trim().isEmpty()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean hasEmptyFields(VBox box, String fieldType) {
+        if (box == null) return false;
+        List<Node> children = box.getChildren();
+
+        for (Node n : children) {
+            if (n instanceof HBox) {
+                HBox h = (HBox) n;
+                for (Node c : h.getChildren()) {
+                    if (c instanceof TextArea) {
+                        TextArea ta = (TextArea) c;
+                        if (ta.getText() == null || ta.getText().trim().isEmpty()) {
+                            return true;
+                        }
+                    }
+                }
+            } else if (n instanceof TextArea) {
+                TextArea ta = (TextArea) n;
+                if (ta.getText() == null || ta.getText().trim().isEmpty()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean hasEmptyProjectFields(VBox box) {
+        if (box == null) return false;
+        List<Node> children = box.getChildren();
+
+        for (Node n : children) {
+            if (n instanceof VBox) {
+                VBox projectVBox = (VBox) n;
+                String title = null;
+                String description = null;
+                boolean titleFieldExists = false;
+                boolean descFieldExists = false;
+
+                for (Node child : projectVBox.getChildren()) {
+                    if (child instanceof TextField) {
+                        TextField tf = (TextField) child;
+                        if ("title".equals(tf.getUserData())) {
+                            titleFieldExists = true;
+                            title = tf.getText() != null && !tf.getText().trim().isEmpty() ? tf.getText().trim() : null;
+                        }
+                    } else if (child instanceof TextArea) {
+                        TextArea ta = (TextArea) child;
+                        if ("description".equals(ta.getUserData())) {
+                            descFieldExists = true;
+                            description = ta.getText() != null && !ta.getText().trim().isEmpty() ? ta.getText().trim() : null;
+                        }
+                    }
+                }
+
+                if ((titleFieldExists && title == null) || (descFieldExists && description == null)) {
                     return true;
                 }
             }
