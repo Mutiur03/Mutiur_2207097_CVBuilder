@@ -1,0 +1,44 @@
+.main-pane {
+    -fx-background-color: #f5f7f9;
+}
+
+.inner-scroll {
+    -fx-background-color: transparent;
+}
+
+.content-outer {
+    -fx-background-color: #ffffff;
+}
+
+.section-heading {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+.image-frame {
+    -fx-border-color: #ccc;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 6, 0, 0, 2);
+}
+
+.save-button {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 8 16 8 16;
+    -fx-background-radius: 4;
+}
+
+.removable-container {
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
+    -fx-padding: 10;
+    -fx-background-color: #fafafa;
+}
+
+.danger-button {
+    -fx-background-color: #f44336;
+    -fx-text-fill: white;
+}
+

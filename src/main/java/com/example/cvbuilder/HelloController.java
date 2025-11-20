@@ -89,7 +89,7 @@ public class HelloController implements Initializable {
 
     private VBox createRemovableEducationFields(VBox parent) {
         VBox educationContainer = new VBox(8);
-        educationContainer.setStyle("-fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-padding: 10; -fx-background-color: #f9f9f9;");
+        educationContainer.getStyleClass().add("removable-container");
 
         TextField schoolField = new TextField();
         schoolField.setPromptText("School/College/University");
@@ -104,7 +104,7 @@ public class HelloController implements Initializable {
         resultField.setUserData("result");
 
         Button removeBtn = new Button("Remove Education");
-        removeBtn.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
+        removeBtn.getStyleClass().add("danger-button");
         removeBtn.setOnAction(e -> {
             if (parent != null) {
                 parent.getChildren().remove(educationContainer);
@@ -120,7 +120,7 @@ public class HelloController implements Initializable {
 
     private VBox createRemovableExperienceFields(VBox parent) {
         VBox experienceContainer = new VBox(8);
-        experienceContainer.setStyle("-fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-padding: 10; -fx-background-color: #f9f9f9;");
+        experienceContainer.getStyleClass().add("removable-container");
         TextField jobTitleField = new TextField();
         jobTitleField.setPromptText("Job Title");
         jobTitleField.setUserData("jobTitle");
@@ -145,7 +145,7 @@ public class HelloController implements Initializable {
             }
         });
         Button removeBtn = new Button("Remove Experience");
-        removeBtn.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
+        removeBtn.getStyleClass().add("danger-button");
         removeBtn.setOnAction(e -> {
             if (parent != null) {
                 parent.getChildren().remove(experienceContainer);
@@ -160,7 +160,7 @@ public class HelloController implements Initializable {
 
     private VBox createRemovableProjectFields(VBox parent) {
         VBox projectContainer = new VBox(8);
-        projectContainer.setStyle("-fx-border-color: #e0e0e0; -fx-border-width: 1; -fx-padding: 10; -fx-background-color: #f9f9f9;");
+        projectContainer.getStyleClass().add("removable-container");
 
         TextField titleField = new TextField();
         titleField.setPromptText("Project Title");
@@ -177,7 +177,7 @@ public class HelloController implements Initializable {
         linkField.setUserData("link");
 
         Button removeBtn = new Button("Remove Project");
-        removeBtn.setStyle("-fx-background-color: #f44336; -fx-text-fill: white;");
+        removeBtn.getStyleClass().add("danger-button");
         removeBtn.setOnAction(e -> {
             if (parent != null) {
                 parent.getChildren().remove(projectContainer);

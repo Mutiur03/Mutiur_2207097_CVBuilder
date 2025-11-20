@@ -1,0 +1,32 @@
+
+.home-root {
+    -fx-background-color: white;
+}
+
+.home-center {
+    -fx-alignment: center;
+}
+
+.title-label {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #222;
+}
+
+.subtitle-label {
+    -fx-font-size: 16px;
+    -fx-text-fill: #555;
+}
+
+.primary-button {
+    -fx-font-size: 16px;
+    -fx-background-color: #4A90E2;
+    -fx-background-radius: 8;
+    -fx-text-fill: white;
+    -fx-padding: 10 18 10 18;
+}
+
+.primary-button:hover {
+    -fx-background-color: #387ACC;
+}
+
