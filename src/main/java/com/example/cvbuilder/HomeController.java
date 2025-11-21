@@ -45,22 +45,20 @@ public class HomeController implements Initializable {
         Image img = null;
             String p = s.getProfileImagePath();
             if (p != null && !p.isBlank()) {
-                // try as absolute or relative file path first
                 File f = new File(p);
                 if (f.exists()) {
-                    img = new Image(f.toURI().toString(), 120, 120, true, true);
+                    img = new Image(f.toURI().toString());
                 } else {
-                    // try loading from classpath under /com/example/cvbuilder/
                     var is = getClass().getResourceAsStream((p.startsWith("/") ? p : "/com/example/cvbuilder/" + p));
                     if (is != null) {
-                        img = new Image(is, 120, 120, true, true);
+                        img = new Image(is);
                     }
                 }
             }
         if (img == null) {
             var is = getClass().getResourceAsStream("/com/example/cvbuilder/person.png");
             if (is != null) {
-                img = new Image(is, 120, 120, true, true);
+                img = new Image(is);
             }
         }
         ImageView iv = new ImageView();

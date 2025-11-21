@@ -7,15 +7,19 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
+import java.nio.file.Paths;
 
 public class showCV {
     @FXML
@@ -64,40 +68,24 @@ public class showCV {
         System.out.println("Address: " + cvData.getAddress());
         System.out.println("Skills: " + cvData.getSkills());
         System.out.println("Image: " + cvData.getProfileImagePath());
-        if (cvData.getProfileImage() != null && profileImageView != null) {
-            profileImageView.setImage(cvData.getProfileImage());
+        Image img = null;
+        String p = cvData.getProfileImagePath();
+        if (p != null && !p.isBlank()) {
+            File f = new File(p);
+            if (f.exists()) {
+                img = new Image(f.toURI().toString());
+            }
+            else {
+                var is = getClass().getResourceAsStream((p.startsWith("/") ? p : "/com/example/cvbuilder/" + p));
+                if (is != null) {
+                    img = new Image(is);
+                }
+            }
         }
-//        else if (profileImageView != null) {
-//            String path = cvData.getProfileImagePath();
-//            if (path != null && !path.trim().isEmpty()) {
-//                try {
-//                    Image img = null;
-//                    File f = new File(path);
-//                    if (f.exists()) {
-//                        img = new Image(f.toURI().toString());
-//                    } else {File rel = Paths.get(System.getProperty("user.dir")).resolve(path).toFile();
-//                        if (rel.exists()) {
-//                            img = new Image(rel.toURI().toString());
-//                        } else {
-//                            URL res = getClass().getResource(path.startsWith("/") ? path : "/com/example/cvbuilder/" + path);
-//                            if (res != null) img = new Image(res.toString());
-//                        }
-//                    }
-//
-//                    if (img != null) {
-//                        profileImageView.setImage(img);
-//                        cvData.setProfileImage(img);
-//                    } else {
-//                        URL person = getClass().getResource("person.png");
-//                        if (person != null) {
-//                            profileImageView.setImage(new Image(person.toString()));
-//                        }
-//                    }
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
+
+        if (profileImageView != null && img != null) {
+            profileImageView.setImage(img);
+        }
 
         if (educationVBox != null) {
             educationVBox.getChildren().clear();
@@ -169,7 +157,6 @@ public class showCV {
                 for (int i = 0; i < cvData.getExperienceList().size(); i++) {
                     CVData.Experience exp = cvData.getExperienceList().get(i);
 
-                    // Create a table-like structure using GridPane
                     GridPane expGrid = new GridPane();
                     expGrid.setHgap(15);
                     expGrid.setVgap(8);
@@ -209,6 +196,7 @@ public class showCV {
                         row++;
                     }
 
+                    // Build duration string
                     StringBuilder dateRangeBuilder = new StringBuilder();
                     if (exp.getStartDate() != null && !exp.getStartDate().trim().isEmpty()) {
                         dateRangeBuilder.append(exp.getStartDate());
@@ -222,9 +210,10 @@ public class showCV {
                         }
                     } else if (exp.getEndDate() != null && !exp.getEndDate().trim().isEmpty()) {
                         if (dateRangeBuilder.length() > 0) {
-                            dateRangeBuilder.append(" - ");
+                            dateRangeBuilder.append(" - ").append(exp.getEndDate());
+                        } else {
+                            dateRangeBuilder.append(exp.getEndDate());
                         }
-                        dateRangeBuilder.append(exp.getEndDate());
                     }
 
                     if (dateRangeBuilder.length() > 0) {
@@ -241,6 +230,7 @@ public class showCV {
 
                         expGrid.add(durationLabel, 0, row);
                         expGrid.add(durationValue, 1, row);
+                        row++;
                     }
 
                     experienceVBox.getChildren().add(expGrid);
@@ -316,6 +306,7 @@ public class showCV {
 
                         projGrid.add(linkLabel, 0, row);
                         projGrid.add(hyperlink, 1, row);
+                        row++;
                     }
 
                     projectVBox.getChildren().add(projGrid);
