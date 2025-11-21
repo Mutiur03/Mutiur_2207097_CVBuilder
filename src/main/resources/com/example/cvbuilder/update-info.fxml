@@ -18,15 +18,18 @@
 
 <BorderPane styleClass="main-pane" stylesheets="@update-info.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.cvbuilder.HelloController">
     <center>
-        <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="inner-scroll">
-            <VBox spacing="20.0" styleClass="content-outer">
+        <ScrollPane fitToHeight="true" fitToWidth="true" styleClass="inner-scroll" pannable="true">
+            <VBox styleClass="content-outer" spacing="16.0">
                 <padding>
-                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    <Insets top="20.0" right="20.0" bottom="20.0" left="20.0" />
                 </padding>
 
-                <VBox spacing="10.0">
+                <VBox styleClass="section" spacing="10.0">
                     <Label styleClass="section-heading" text="Personal Information" />
-                    <GridPane hgap="10.0" vgap="10.0">
+                    <GridPane hgap="12.0" vgap="8.0">
+                        <padding>
+                            <Insets top="10.0" right="10.0" bottom="10.0" left="10.0" />
+                        </padding>
                         <columnConstraints>
                             <ColumnConstraints hgrow="SOMETIMES" minWidth="120.0" />
                             <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" />
@@ -36,11 +39,11 @@
                         <Label text="Full Name:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
                         <TextField fx:id="fullNameField" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-                        <VBox alignment="CENTER" spacing="5.0" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.rowSpan="4">
-                            <ImageView fx:id="imageSelect" fitHeight="120.0" fitWidth="120.0" pickOnBounds="true" preserveRatio="true" styleClass="image-frame">
-                        <image>
-                           <Image url="@person.png" />
-                        </image></ImageView>
+                        <VBox styleClass="image-container" GridPane.columnIndex="2" GridPane.rowIndex="0" GridPane.rowSpan="4" spacing="8.0" alignment="CENTER">
+                            <!-- Set a reasonable size for preview and preserve ratio -->
+                            <ImageView fx:id="imageSelect" pickOnBounds="true" preserveRatio="true" fitWidth="120.0" fitHeight="140.0" styleClass="image-frame">
+                                <Image url="@person.png" />
+                            </ImageView>
                             <Button mnemonicParsing="false" onAction="#imageChange" text="Choose Image" />
                         </VBox>
 
@@ -51,7 +54,7 @@
                         <TextField fx:id="phoneField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
                         <Label text="Address:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
-                        <TextArea fx:id="addressField" prefHeight="60.0" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                        <TextArea fx:id="addressField" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                   <rowConstraints>
                      <RowConstraints />
                      <RowConstraints />
@@ -62,44 +65,44 @@
                 </VBox>
                 <Separator />
 
-                <VBox spacing="10.0">
-                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <VBox styleClass="section" spacing="8.0">
+                    <HBox styleClass="section-header" spacing="8.0" alignment="CENTER_LEFT">
                         <Label styleClass="section-heading" text="Educational Qualifications" />
                         <Button mnemonicParsing="false" onAction="#addEducation" text="+ Add Education" />
                     </HBox>
-                    <VBox fx:id="eduBox" spacing="8.0" />
+                    <VBox fx:id="eduBox" styleClass="list-box" spacing="8.0" />
                 </VBox>
 
                 <Separator />
 
-                <VBox spacing="10.0">
-                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <VBox styleClass="section" spacing="8.0">
+                    <HBox styleClass="section-header" spacing="8.0" alignment="CENTER_LEFT">
                         <Label styleClass="section-heading" text="Work Experience" />
                         <Button mnemonicParsing="false" onAction="#addExperience" text="+ Add Experience" />
                     </HBox>
-                    <VBox fx:id="expBox" spacing="8.0" />
+                    <VBox fx:id="expBox" styleClass="list-box" spacing="8.0" />
                 </VBox>
 
                 <Separator />
 
-                <VBox spacing="10.0">
-                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                <VBox styleClass="section" spacing="8.0">
+                    <HBox styleClass="section-header" spacing="8.0" alignment="CENTER_LEFT">
                         <Label styleClass="section-heading" text="Projects" />
                         <Button mnemonicParsing="false" onAction="#addProject" text="+ Add Project" />
                     </HBox>
-                    <VBox fx:id="projBox" spacing="8.0" />
+                    <VBox fx:id="projBox" styleClass="list-box" spacing="8.0" />
                 </VBox>
 
                 <Separator />
 
-                <VBox spacing="10.0">
+                <VBox styleClass="section" spacing="8.0">
                     <Label styleClass="section-heading" text="Skills" />
-                    <TextArea fx:id="skillsField" prefHeight="80.0" wrapText="true" />
+                    <TextArea fx:id="skillsField" wrapText="true" />
                 </VBox>
 
-                <HBox alignment="CENTER" spacing="10.0">
+                <HBox styleClass="actions" alignment="CENTER_RIGHT">
                     <padding>
-                        <Insets top="10.0" />
+                        <Insets top="10.0" right="10.0" bottom="10.0" left="10.0" />
                     </padding>
                     <Button mnemonicParsing="false" onAction="#saveInformation" styleClass="save-button" text="Save Information" />
                 </HBox>

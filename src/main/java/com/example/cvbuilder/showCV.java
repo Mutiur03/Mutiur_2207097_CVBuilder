@@ -58,10 +58,46 @@ public class showCV {
         phoneLabel.setText(defaultIfNull(cvData.getPhone()));
         addressLabel.setText(defaultIfNull(cvData.getAddress()));
         skillsLabel.setText(defaultIfNull(cvData.getSkills()));
-
+        System.out.println("Name: " + cvData.getFullName());
+        System.out.println("Email: " + cvData.getEmail());
+        System.out.println("Phone: " + cvData.getPhone());
+        System.out.println("Address: " + cvData.getAddress());
+        System.out.println("Skills: " + cvData.getSkills());
+        System.out.println("Image: " + cvData.getProfileImagePath());
         if (cvData.getProfileImage() != null && profileImageView != null) {
             profileImageView.setImage(cvData.getProfileImage());
         }
+//        else if (profileImageView != null) {
+//            String path = cvData.getProfileImagePath();
+//            if (path != null && !path.trim().isEmpty()) {
+//                try {
+//                    Image img = null;
+//                    File f = new File(path);
+//                    if (f.exists()) {
+//                        img = new Image(f.toURI().toString());
+//                    } else {File rel = Paths.get(System.getProperty("user.dir")).resolve(path).toFile();
+//                        if (rel.exists()) {
+//                            img = new Image(rel.toURI().toString());
+//                        } else {
+//                            URL res = getClass().getResource(path.startsWith("/") ? path : "/com/example/cvbuilder/" + path);
+//                            if (res != null) img = new Image(res.toString());
+//                        }
+//                    }
+//
+//                    if (img != null) {
+//                        profileImageView.setImage(img);
+//                        cvData.setProfileImage(img);
+//                    } else {
+//                        URL person = getClass().getResource("person.png");
+//                        if (person != null) {
+//                            profileImageView.setImage(new Image(person.toString()));
+//                        }
+//                    }
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
 
         if (educationVBox != null) {
             educationVBox.getChildren().clear();
@@ -77,7 +113,6 @@ public class showCV {
                     if (i < cvData.getEducationList().size() - 1) {
                         VBox.setMargin(eduGrid, new javafx.geometry.Insets(0, 0, 12, 0));
                     }
-
                     int row = 0;
 
                     if (edu.getDegree() != null && !edu.getDegree().trim().isEmpty()) {

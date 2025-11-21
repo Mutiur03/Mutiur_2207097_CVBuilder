@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CVData {
+    private Long id;
     private String fullName;
     private String email;
     private String phone;
     private String address;
     private String skills;
     private Image profileImage;
+    private String profileImagePath;
     private List<Education> educationList;
     private List<Experience> experienceList;
     private List<Project> projectList;
@@ -20,6 +22,9 @@ public class CVData {
         this.experienceList = new ArrayList<>();
         this.projectList = new ArrayList<>();
     }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
     public String getFullName() { return fullName; }
     public void setFullName(String fullName) { this.fullName = fullName; }
@@ -33,11 +38,19 @@ public class CVData {
     public String getAddress() { return address; }
     public void setAddress(String address) { this.address = address; }
 
-    public String getSkills() { return skills; }
-    public void setSkills(String skills) { this.skills = skills; }
+    public String getSkills() {
+        return skills;
+    }
+
+    public void setSkills(String skills) {
+        this.skills = skills;
+    }
 
     public Image getProfileImage() { return profileImage; }
     public void setProfileImage(Image profileImage) { this.profileImage = profileImage; }
+
+    public String getProfileImagePath() { return profileImagePath; }
+    public void setProfileImagePath(String profileImagePath) { this.profileImagePath = profileImagePath; }
 
     public List<Education> getEducationList() { return educationList; }
     public void addEducation(Education education) { this.educationList.add(education); }
@@ -98,9 +111,7 @@ public class CVData {
         }
 
         public String getTitle() { return title; }
-
         public String getDescription() { return description; }
-
         public String getLink() { return link; }
     }
 }

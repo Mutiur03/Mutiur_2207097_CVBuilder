@@ -19,8 +19,14 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import java.io.File;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 public class HelloController implements Initializable {
     @FXML
@@ -50,9 +56,13 @@ public class HelloController implements Initializable {
     @FXML
     private VBox projBox;
 
+    private String selectedImagePath;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        addEducation();
+        if (eduBox != null) {
+            eduBox.getChildren().add(createRemovableEducationFields(eduBox, false));
+        }
     }
 
     @FXML
@@ -63,13 +73,14 @@ public class HelloController implements Initializable {
         if (file != null) {
             Image image = new Image(file.toURI().toString());
             if (imageSelect != null) imageSelect.setImage(image);
+            selectedImagePath = file.getAbsolutePath();
         }
     }
 
     @FXML
     private void addEducation() {
         if (eduBox != null) {
-            eduBox.getChildren().add(createRemovableEducationFields(eduBox));
+            eduBox.getChildren().add(createRemovableEducationFields(eduBox,true));
         }
     }
 
@@ -87,7 +98,7 @@ public class HelloController implements Initializable {
         }
     }
 
-    private VBox createRemovableEducationFields(VBox parent) {
+    private VBox createRemovableEducationFields(VBox parent, boolean rmbtn) {
         VBox educationContainer = new VBox(8);
         educationContainer.getStyleClass().add("removable-container");
 
@@ -103,19 +114,24 @@ public class HelloController implements Initializable {
         resultField.setPromptText("Result");
         resultField.setUserData("result");
 
-        Button removeBtn = new Button("Remove Education");
-        removeBtn.getStyleClass().add("danger-button");
-        removeBtn.setOnAction(e -> {
-            if (parent != null) {
-                parent.getChildren().remove(educationContainer);
-            }
-        });
+       if(rmbtn){
+           Button removeBtn = new Button("Remove Education");
+           removeBtn.getStyleClass().add("danger-button");
+           removeBtn.setOnAction(e -> {
+               if (parent != null) {
+                   parent.getChildren().remove(educationContainer);
+               }
+           });
 
-        HBox buttonBox = new HBox(removeBtn);
-        buttonBox.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
+           HBox buttonBox = new HBox(removeBtn);
+           buttonBox.setAlignment(javafx.geometry.Pos.CENTER_RIGHT);
 
-        educationContainer.getChildren().addAll(schoolField, degreeField, resultField, buttonBox);
+           educationContainer.getChildren().addAll(schoolField, degreeField, resultField, buttonBox);
+           return educationContainer;
+       }
+        educationContainer.getChildren().addAll(schoolField, degreeField, resultField);
         return educationContainer;
+
     }
 
     private VBox createRemovableExperienceFields(VBox parent) {
@@ -208,10 +224,31 @@ public class HelloController implements Initializable {
             if (imageSelect != null && imageSelect.getImage() != null) {
                 cvData.setProfileImage(imageSelect.getImage());
             }
+            if (selectedImagePath != null) {
+                String copiedPath = copyImageToProject(selectedImagePath);
+                if (copiedPath != null) {
+                    cvData.setProfileImagePath(copiedPath);
+                } else {
+                    Alert warn = new Alert(Alert.AlertType.WARNING, "Failed to copy selected image into project resources. The image will not be saved with this CV.", ButtonType.OK);
+                    warn.setHeaderText(null);
+                    warn.showAndWait();
+                }
+            }
 
             collectEducationsFromBox(eduBox, cvData::addEducation);
             collectExperiencesFromBox(expBox, cvData::addExperience);
             collectProjectsFromBox(projBox, cvData::addProject);
+
+            CVDao dao = new CVDao();
+            long cvId = -1;
+            try {
+                cvId = dao.createCV(cvData);
+                cvData.setId(cvId);
+            } catch (SQLException sqe) {
+                System.err.println("Failed to save CV to database: " + sqe.getMessage());
+                sqe.printStackTrace();
+            }
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("CV.fxml"));
             Parent root = loader.load();
             showCV cvController = loader.getController();
@@ -229,6 +266,41 @@ public class HelloController implements Initializable {
             Alert alert = new Alert(Alert.AlertType.ERROR, "An unexpected error occurred while saving your CV. " + e.getMessage(), ButtonType.OK);
             alert.setHeaderText("Save Error");
             alert.showAndWait();
+        }
+    }
+
+    /**
+     * Copy the selected image file into the project's resource images folder:
+     * src/main/resources/com/example/cvbuilder/images
+     * Returns the classpath-relative path (e.g. "images/123_filename.png") that can be used
+     * with getResource("/com/example/cvbuilder/" + relativePath), or null if the copy failed.
+     */
+    private String copyImageToProject(String sourceAbsolutePath) {
+        if (sourceAbsolutePath == null) return null;
+        try {
+            Path src = Paths.get(sourceAbsolutePath);
+            if (!Files.exists(src)) return null;
+
+            // target resources/images folder inside the project so it becomes available on the classpath
+            Path projectDir = Paths.get(System.getProperty("user.dir"));
+            Path imagesPath = projectDir.resolve("src").resolve("main").resolve("resources").resolve("com").resolve("example").resolve("cvbuilder").resolve("images");
+            if (Files.notExists(imagesPath)) {
+                Files.createDirectories(imagesPath);
+            }
+
+            String originalFileName = src.getFileName().toString();
+            String destFileName = System.currentTimeMillis() + "_" + originalFileName;
+            Path dest = imagesPath.resolve(destFileName);
+
+            Files.copy(src, dest, StandardCopyOption.REPLACE_EXISTING);
+            // return classpath relative path
+            String rel = "images/" + destFileName;
+            System.out.println("Copied image to resources: " + dest.toAbsolutePath());
+            return rel.replace('\\', '/');
+        } catch (IOException ioe) {
+            System.err.println("Failed to copy image to project resources images folder: " + ioe.getMessage());
+            ioe.printStackTrace();
+            return null;
         }
     }
 

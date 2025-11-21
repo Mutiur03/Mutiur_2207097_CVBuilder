@@ -2,8 +2,10 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.TilePane?>
 
 <AnchorPane prefHeight="600" prefWidth="900"
             stylesheets="@home.css"
@@ -29,6 +31,11 @@
                 prefHeight="45"
                 prefWidth="140"
                 styleClass="primary-button" />
+        <Label text="Saved CVs" styleClass="subtitle-label" />
+        <ScrollPane fitToWidth="true" prefViewportHeight="240" prefViewportWidth="700">
+            <TilePane fx:id="thumbnailsPane" hgap="12" vgap="12" prefColumns="3" stylesheets="@home.css" />
+        </ScrollPane>
+
     </VBox>
 
 </AnchorPane>
