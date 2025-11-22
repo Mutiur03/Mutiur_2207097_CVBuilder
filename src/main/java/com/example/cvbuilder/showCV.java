@@ -18,8 +18,6 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
-import java.nio.file.Paths;
 
 public class showCV {
     @FXML
@@ -49,7 +47,10 @@ public class showCV {
     @FXML
     private Label skillsLabel;
 
+    private CVData currentCV;
+
     public void displayCV(CVData cvData) {
+        this.currentCV = cvData;
         if (cvData == null) {
             Alert alert = new Alert(Alert.AlertType.WARNING, "No CV data to display.", javafx.scene.control.ButtonType.OK);
             alert.setHeaderText("No data");
@@ -62,12 +63,7 @@ public class showCV {
         phoneLabel.setText(defaultIfNull(cvData.getPhone()));
         addressLabel.setText(defaultIfNull(cvData.getAddress()));
         skillsLabel.setText(defaultIfNull(cvData.getSkills()));
-        System.out.println("Name: " + cvData.getFullName());
-        System.out.println("Email: " + cvData.getEmail());
-        System.out.println("Phone: " + cvData.getPhone());
-        System.out.println("Address: " + cvData.getAddress());
-        System.out.println("Skills: " + cvData.getSkills());
-        System.out.println("Image: " + cvData.getProfileImagePath());
+
         Image img = null;
         String p = cvData.getProfileImagePath();
         if (p != null && !p.isBlank()) {
@@ -203,20 +199,20 @@ public class showCV {
                     }
 
                     if (exp.isCurrentlyWorking()) {
-                        if (dateRangeBuilder.length() > 0) {
+                        if (!dateRangeBuilder.isEmpty()) {
                             dateRangeBuilder.append(" - Present");
                         } else {
                             dateRangeBuilder.append("Present");
                         }
                     } else if (exp.getEndDate() != null && !exp.getEndDate().trim().isEmpty()) {
-                        if (dateRangeBuilder.length() > 0) {
+                        if (!dateRangeBuilder.isEmpty()) {
                             dateRangeBuilder.append(" - ").append(exp.getEndDate());
                         } else {
                             dateRangeBuilder.append(exp.getEndDate());
                         }
                     }
 
-                    if (dateRangeBuilder.length() > 0) {
+                    if (!dateRangeBuilder.isEmpty()) {
                         Label durationLabel = new Label("Duration:");
                         durationLabel.getStyleClass().add("field-label");
 
@@ -297,10 +293,11 @@ public class showCV {
                         hyperlink.setWrapText(true);
 
                         hyperlink.setOnAction(event -> {
+                            event.consume();
                             try {
                                 Desktop.getDesktop().browse(new URI(proj.getLink()));
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                            } catch (Exception ex) {
+                                System.out.println(ex.getMessage());
                             }
                         });
 
@@ -329,6 +326,33 @@ public class showCV {
         Parent root = fxmlLoader.load();
         Stage stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
         SceneUtils.switchScene(stage, root, "CV Builder");
+    }
+
+    @FXML
+    public void editCV(ActionEvent event) {
+        if (currentCV == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "No CV loaded to edit.", javafx.scene.control.ButtonType.OK);
+            alert.setHeaderText("No CV");
+            alert.showAndWait();
+            return;
+        }
+
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("update-info.fxml"));
+            Parent root = fxmlLoader.load();
+            Object controller = fxmlLoader.getController();
+            if (controller instanceof HelloController) {
+                // ensure the editor is pre-populated with the current CV data
+                HelloController helloCtrl = (HelloController) controller;
+                helloCtrl.loadCVData(currentCV);
+            }
+            Stage stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
+            SceneUtils.switchScene(stage, root, "Edit CV");
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to open editor for editing: " + e.getMessage(), javafx.scene.control.ButtonType.OK);
+            alert.setHeaderText("Open Editor Error");
+            alert.showAndWait();
+        }
     }
 
 }

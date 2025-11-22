@@ -1,5 +1,6 @@
 package com.example.cvbuilder;
 
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -58,9 +59,11 @@ public class HelloController implements Initializable {
 
     private String selectedImagePath;
 
+    private CVData editingCV;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        if (eduBox != null) {
+        if (eduBox != null && eduBox.getChildren().isEmpty()) {
             eduBox.getChildren().add(createRemovableEducationFields(eduBox, false));
         }
     }
@@ -118,6 +121,7 @@ public class HelloController implements Initializable {
            Button removeBtn = new Button("Remove Education");
            removeBtn.getStyleClass().add("danger-button");
            removeBtn.setOnAction(e -> {
+               e.consume();
                if (parent != null) {
                    parent.getChildren().remove(educationContainer);
                }
@@ -153,6 +157,7 @@ public class HelloController implements Initializable {
         currentlyWorkingCheckBox.setUserData("currentlyWorking");
 
         currentlyWorkingCheckBox.selectedProperty().addListener((obs, oldVal, newVal) -> {
+
             if (newVal) {
                 endDateField.setDisable(true);
                 endDateField.clear();
@@ -163,6 +168,7 @@ public class HelloController implements Initializable {
         Button removeBtn = new Button("Remove Experience");
         removeBtn.getStyleClass().add("danger-button");
         removeBtn.setOnAction(e -> {
+            e.consume();
             if (parent != null) {
                 parent.getChildren().remove(experienceContainer);
             }
@@ -195,6 +201,7 @@ public class HelloController implements Initializable {
         Button removeBtn = new Button("Remove Project");
         removeBtn.getStyleClass().add("danger-button");
         removeBtn.setOnAction(e -> {
+            e.consume();
             if (parent != null) {
                 parent.getChildren().remove(projectContainer);
             }
@@ -215,6 +222,10 @@ public class HelloController implements Initializable {
             }
 
             CVData cvData = new CVData();
+            if (editingCV != null && editingCV.getId() != null) {
+                cvData.setId(editingCV.getId());
+            }
+
             cvData.setFullName(getTextOrNull(fullNameField));
             cvData.setEmail(getTextOrNull(emailField));
             cvData.setPhone(getTextOrNull(phoneField));
@@ -233,6 +244,8 @@ public class HelloController implements Initializable {
                     warn.setHeaderText(null);
                     warn.showAndWait();
                 }
+            } else if (editingCV != null && editingCV.getProfileImagePath() != null) {
+                cvData.setProfileImagePath(editingCV.getProfileImagePath());
             }
 
             collectEducationsFromBox(eduBox, cvData::addEducation);
@@ -240,13 +253,20 @@ public class HelloController implements Initializable {
             collectProjectsFromBox(projBox, cvData::addProject);
 
             CVDao dao = new CVDao();
-            long cvId = -1;
+            long cvId;
             try {
-                cvId = dao.createCV(cvData);
+                if (cvData.getId() != null) {
+                    boolean updated = dao.updateCV(cvData);
+                    if (!updated) {
+                        throw new SQLException("No rows updated for CV id " + cvData.getId());
+                    }
+                    cvId = cvData.getId();
+                } else {
+                    cvId = dao.createCV(cvData);
+                }
                 cvData.setId(cvId);
             } catch (SQLException sqe) {
-                System.err.println("Failed to save CV to database: " + sqe.getMessage());
-                sqe.printStackTrace();
+                System.out.println(sqe.getMessage());
             }
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("CV.fxml"));
@@ -261,8 +281,7 @@ public class HelloController implements Initializable {
             successAlert.setContentText("Your CV has been successfully generated!");
             successAlert.showAndWait();
         } catch (Exception e) {
-            System.err.println("Error while saving information and displaying CV: " + e.getMessage());
-            e.printStackTrace();
+
             Alert alert = new Alert(Alert.AlertType.ERROR, "An unexpected error occurred while saving your CV. " + e.getMessage(), ButtonType.OK);
             alert.setHeaderText("Save Error");
             alert.showAndWait();
@@ -278,10 +297,9 @@ public class HelloController implements Initializable {
     private String copyImageToProject(String sourceAbsolutePath) {
         if (sourceAbsolutePath == null) return null;
         try {
-            Path src = Paths.get(sourceAbsolutePath);
-            if (!Files.exists(src)) return null;
+             Path src = Paths.get(sourceAbsolutePath);
+             if (!Files.exists(src)) return null;
 
-            // target resources/images folder inside the project so it becomes available on the classpath
             Path projectDir = Paths.get(System.getProperty("user.dir"));
             Path imagesPath = projectDir.resolve("src").resolve("main").resolve("resources").resolve("com").resolve("example").resolve("cvbuilder").resolve("images");
             if (Files.notExists(imagesPath)) {
@@ -293,13 +311,11 @@ public class HelloController implements Initializable {
             Path dest = imagesPath.resolve(destFileName);
 
             Files.copy(src, dest, StandardCopyOption.REPLACE_EXISTING);
-            // return classpath relative path
             String rel = "images/" + destFileName;
             System.out.println("Copied image to resources: " + dest.toAbsolutePath());
             return rel.replace('\\', '/');
         } catch (IOException ioe) {
-            System.err.println("Failed to copy image to project resources images folder: " + ioe.getMessage());
-            ioe.printStackTrace();
+
             return null;
         }
     }
@@ -588,4 +604,89 @@ public class HelloController implements Initializable {
         alert.setContentText(message);
         alert.showAndWait();
     }
-}
+
+    public void loadCVData(CVData cv) {
+        if (cv == null) return;
+        this.editingCV = cv;
+
+        if (fullNameField != null) fullNameField.setText(cv.getFullName());
+        if (emailField != null) emailField.setText(cv.getEmail());
+        if (phoneField != null) phoneField.setText(cv.getPhone());
+        if (addressField != null) addressField.setText(cv.getAddress());
+        if (skillsField != null) skillsField.setText(cv.getSkills());
+
+        // load image if path present
+        if (cv.getProfileImagePath() != null && imageSelect != null) {
+            try {
+                File f = new File(cv.getProfileImagePath());
+                if (f.exists()) {
+                    imageSelect.setImage(new Image(f.toURI().toString()));
+                } else {
+                    var is = getClass().getResourceAsStream((cv.getProfileImagePath().startsWith("/") ? cv.getProfileImagePath() : "/com/example/cvbuilder/" + cv.getProfileImagePath()));
+                    if (is != null) imageSelect.setImage(new Image(is));
+                }
+            } catch (Exception e) {
+                // ignore loading errors
+            }
+        }
+
+        if (eduBox != null) {
+            eduBox.getChildren().clear();
+            if (cv.getEducationList() != null && !cv.getEducationList().isEmpty()) {
+                for (CVData.Education e : cv.getEducationList()) {
+                     VBox box = createRemovableEducationFields(eduBox, true);
+                     // set values
+                     for (Node n : box.getChildren()) {
+                         if (n instanceof TextField tf) {
+                             if ("school".equals(tf.getUserData())) tf.setText(e.getSchool());
+                             if ("degree".equals(tf.getUserData())) tf.setText(e.getDegree());
+                             if ("result".equals(tf.getUserData())) tf.setText(e.getResult());
+                         }
+                     }
+                     eduBox.getChildren().add(box);
+                 }
+             } else {
+                 eduBox.getChildren().add(createRemovableEducationFields(eduBox, false));
+             }
+         }
+
+         if (expBox != null) {
+             expBox.getChildren().clear();
+             if (cv.getExperienceList() != null && !cv.getExperienceList().isEmpty()) {
+                 for (CVData.Experience ex : cv.getExperienceList()) {
+                     VBox box = createRemovableExperienceFields(expBox);
+                     for (Node n : box.getChildren()) {
+                         if (n instanceof TextField tf) {
+                             if ("jobTitle".equals(tf.getUserData())) tf.setText(ex.getJobTitle());
+                             if ("company".equals(tf.getUserData())) tf.setText(ex.getCompany());
+                             if ("startDate".equals(tf.getUserData())) tf.setText(ex.getStartDate());
+                             if ("endDate".equals(tf.getUserData())) tf.setText(ex.getEndDate());
+                         } else if (n instanceof javafx.scene.control.CheckBox cb) {
+                             if ("currentlyWorking".equals(cb.getUserData())) cb.setSelected(ex.isCurrentlyWorking());
+                         }
+                     }
+                     expBox.getChildren().add(box);
+                 }
+             }
+         }
+
+         if (projBox != null) {
+             projBox.getChildren().clear();
+             if (cv.getProjectList() != null && !cv.getProjectList().isEmpty()) {
+                 for (CVData.Project p : cv.getProjectList()) {
+                     VBox box = createRemovableProjectFields(projBox);
+                     for (Node n : box.getChildren()) {
+                         if (n instanceof TextField tf) {
+                             if ("title".equals(tf.getUserData())) tf.setText(p.getTitle());
+                             if ("link".equals(tf.getUserData())) tf.setText(p.getLink());
+                         } else if (n instanceof TextArea ta) {
+                             if ("description".equals(ta.getUserData())) ta.setText(p.getDescription());
+                         }
+                     }
+                     projBox.getChildren().add(box);
+                 }
+             }
+         }
+     }
+
+ }

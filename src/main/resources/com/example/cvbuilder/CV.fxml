@@ -91,7 +91,8 @@
                 <VBox fx:id="projectVBox" spacing="10.0"/>
             </VBox>
 
-            <HBox alignment="CENTER">
+            <HBox alignment="CENTER" spacing="10.0">
+                <Button text="Edit CV" onAction="#editCV" styleClass="edit-button" />
                 <Button text="← Back to Editor" onAction="#goBack" styleClass="back-button"/>
             </HBox>
         </VBox>

@@ -8,7 +8,7 @@ import java.util.Optional;
 public class CVDao {
     public long createCV(CVData cv) throws SQLException {
         String insertCvSql = "INSERT INTO cvs(full_name,email,phone,address,profile_image_path, skills) VALUES(?,?,?,?,?,?)";
-        try (Connection conn = Database.connect(); PreparedStatement pstmt = conn.prepareStatement(insertCvSql)) {
+        try (Connection conn = Database.connect(); PreparedStatement pstmt = conn.prepareStatement(insertCvSql, Statement.RETURN_GENERATED_KEYS)) {
             if (conn == null) throw new SQLException("DB connection is null");
             conn.setAutoCommit(false);
             try {
@@ -83,7 +83,7 @@ public class CVDao {
 
     public boolean updateCV(CVData cv) throws SQLException {
         if (cv.getId() == null) throw new IllegalArgumentException("CV id is required for update");
-        String updateSql = "UPDATE cvs SET full_name=?,email=?,phone=?,address=?,profile_image_path=?,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id = ?";
+        String updateSql = "UPDATE cvs SET full_name=?,email=?,phone=?,address=?,skills=?,profile_image_path=?,updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id = ?";
         try (Connection conn = Database.connect(); PreparedStatement pstmt = conn.prepareStatement(updateSql)) {
             if (conn == null) throw new SQLException("DB connection is null");
             conn.setAutoCommit(false);
@@ -92,8 +92,9 @@ public class CVDao {
                 pstmt.setString(2, cv.getEmail());
                 pstmt.setString(3, cv.getPhone());
                 pstmt.setString(4, cv.getAddress());
-                pstmt.setString(5, cv.getProfileImagePath());
-                pstmt.setLong(6, cv.getId());
+                pstmt.setString(5, cv.getSkills());
+                pstmt.setString(6, cv.getProfileImagePath());
+                pstmt.setLong(7, cv.getId());
                 int updated = pstmt.executeUpdate();
 
                 deleteChildRows(conn, cv.getId());
@@ -184,10 +185,6 @@ public class CVDao {
             p.executeUpdate();
         }
         try (PreparedStatement p = conn.prepareStatement("DELETE FROM project WHERE cv_id = ?")) {
-            p.setLong(1, cvId);
-            p.executeUpdate();
-        }
-        try (PreparedStatement p = conn.prepareStatement("DELETE FROM skill WHERE cv_id = ?")) {
             p.setLong(1, cvId);
             p.executeUpdate();
         }
