@@ -74,7 +74,6 @@ public class CVDao {
         try (Connection conn = Database.connect(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 CVSummary s = new CVSummary(rs.getLong("id"), rs.getString("full_name"),  rs.getString("profile_image_path"));
-                System.out.println(s);
                 out.add(s);
             }
         }

@@ -44,7 +44,7 @@
                             <ImageView fx:id="imageSelect" pickOnBounds="true" preserveRatio="true" fitWidth="120.0" fitHeight="140.0" styleClass="image-frame">
                                 <Image url="@person.png" />
                             </ImageView>
-                            <Button mnemonicParsing="false" onAction="#imageChange" text="Choose Image" />
+                            <Button mnemonicParsing="false" onAction="#imageChange" text="Choose Image" styleClass="secondary-button" />
                         </VBox>
 
                         <Label text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="1" />
@@ -68,7 +68,7 @@
                 <VBox styleClass="section" spacing="8.0">
                     <HBox styleClass="section-header" spacing="8.0" alignment="CENTER_LEFT">
                         <Label styleClass="section-heading" text="Educational Qualifications" />
-                        <Button mnemonicParsing="false" onAction="#addEducation" text="+ Add Education" />
+                        <Button mnemonicParsing="false" onAction="#addEducation" text="+ Add Education" styleClass="secondary-button" />
                     </HBox>
                     <VBox fx:id="eduBox" styleClass="list-box" spacing="8.0" />
                 </VBox>
@@ -78,7 +78,7 @@
                 <VBox styleClass="section" spacing="8.0">
                     <HBox styleClass="section-header" spacing="8.0" alignment="CENTER_LEFT">
                         <Label styleClass="section-heading" text="Work Experience" />
-                        <Button mnemonicParsing="false" onAction="#addExperience" text="+ Add Experience" />
+                        <Button mnemonicParsing="false" onAction="#addExperience" text="+ Add Experience" styleClass="secondary-button" />
                     </HBox>
                     <VBox fx:id="expBox" styleClass="list-box" spacing="8.0" />
                 </VBox>
@@ -88,7 +88,7 @@
                 <VBox styleClass="section" spacing="8.0">
                     <HBox styleClass="section-header" spacing="8.0" alignment="CENTER_LEFT">
                         <Label styleClass="section-heading" text="Projects" />
-                        <Button mnemonicParsing="false" onAction="#addProject" text="+ Add Project" />
+                        <Button mnemonicParsing="false" onAction="#addProject" text="+ Add Project" styleClass="secondary-button" />
                     </HBox>
                     <VBox fx:id="projBox" styleClass="list-box" spacing="8.0" />
                 </VBox>
@@ -100,10 +100,11 @@
                     <TextArea fx:id="skillsField" wrapText="true" />
                 </VBox>
 
-                <HBox styleClass="actions" alignment="CENTER_RIGHT">
+                <HBox styleClass="actions" alignment="CENTER_RIGHT" spacing="8.0">
                     <padding>
                         <Insets top="10.0" right="10.0" bottom="10.0" left="10.0" />
                     </padding>
+                    <Button mnemonicParsing="false" onAction="#handleCancel" styleClass="cancel-button" text="Cancel" />
                     <Button mnemonicParsing="false" onAction="#saveInformation" styleClass="save-button" text="Save Information" />
                 </HBox>
             </VBox>

@@ -71,10 +71,6 @@ public class Database {
                         + "link TEXT,"
                         + "FOREIGN KEY (cv_id) REFERENCES cvs(id) ON DELETE CASCADE"
                         + ");");
-//                stmt.addBatch("CREATE INDEX IF NOT EXISTS idx_education_cv ON education(cv_id);");
-//                stmt.addBatch("CREATE INDEX IF NOT EXISTS idx_experience_cv ON experience(cv_id);");
-//                stmt.addBatch("CREATE INDEX IF NOT EXISTS idx_project_cv ON project(cv_id);");
-                System.out.println(stmt);
                 stmt.executeBatch();
                 conn.commit();
             } catch (SQLException e) {

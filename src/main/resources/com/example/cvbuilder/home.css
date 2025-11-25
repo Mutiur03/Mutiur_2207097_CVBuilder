@@ -1,4 +1,3 @@
-
 .home-root {
     -fx-background-color: white;
 }
@@ -30,3 +29,16 @@
     -fx-background-color: #387ACC;
 }
 
+.thumbnail-card {
+    -fx-background-color: white;
+    -fx-padding: 8;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.three-dot-menu {
+    -fx-background-color: white;
+    -fx-opacity: 0.8;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}

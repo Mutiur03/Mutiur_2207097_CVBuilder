@@ -17,9 +17,17 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 import static com.example.cvbuilder.SceneUtils.switchScene;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import java.util.Optional;
+import javafx.scene.layout.StackPane;
+import javafx.geometry.Insets;
 
 public class HomeController implements Initializable {
 
@@ -70,24 +78,82 @@ public class HomeController implements Initializable {
         name.setWrapText(true);
         name.setMaxWidth(120);
         name.setAlignment(Pos.CENTER);
-
-        VBox box = new VBox(6, iv, name);
+        StackPane imageContainer = new StackPane(iv);
+        imageContainer.setPadding(new Insets(8, 8, 4, 8));
+        StackPane.setMargin(iv, new Insets(10, 8, 4, 8));
+        MenuButton menu = new MenuButton();
+        menu.getStyleClass().add("three-dot-menu");
+        MenuItem editItem = new MenuItem("Edit");
+        MenuItem deleteItem = new MenuItem("Delete");
+        menu.getItems().addAll(editItem, deleteItem);
+        StackPane.setAlignment(menu, Pos.TOP_RIGHT);
+        StackPane.setMargin(menu, new Insets(6, 6, 0, 0));
+        imageContainer.getChildren().add(menu);
+        VBox box = new VBox(6);
+        box.getChildren().addAll(imageContainer, name);
         box.setAlignment(Pos.CENTER);
         box.setPrefWidth(140);
-        box.setStyle("-fx-background-color: white; -fx-padding: 8; -fx-border-radius: 6; -fx-background-radius: 6; -fx-effect: dropshadow(two-pass-box, rgba(0,0,0,0.08), 6, 0, 0, 2);");
+        box.getStyleClass().add("thumbnail-card");
 
-        box.setOnMouseClicked(evt -> {
+        editItem.setOnAction(evt -> {
+            evt.consume();
             try {
                 CVDao dao = new CVDao();
                 var opt = dao.getCV(s.getId());
                 if (opt.isPresent()) {
                     CVData cv = opt.get();
-                    URL res = getClass().getResource("CV.fxml");
-                    if (res == null) {
-                        System.err.println("Resource CV.fxml not found on classpath.");
-                        return;
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("update-info.fxml"));
+                    Parent root = loader.load();
+                    HelloController controller = loader.getController();
+                    controller.loadCVData(cv);
+                    Stage stage = (Stage) thumbnailsPane.getScene().getWindow();
+                    switchScene(stage, root, "Edit CV");
+                } else {
+                    Alert a = new Alert(Alert.AlertType.WARNING, "CV not found.", ButtonType.OK);
+                    a.setHeaderText(null);
+                    a.showAndWait();
+                }
+            } catch (Exception ex) {
+                Alert a = new Alert(Alert.AlertType.ERROR, "Failed to open edit form: " + ex.getMessage(), ButtonType.OK);
+                a.setHeaderText("Error");
+                a.showAndWait();
+            }
+        });
+
+        deleteItem.setOnAction(evt -> {
+            evt.consume();
+            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Delete this CV? This cannot be undone.", ButtonType.YES, ButtonType.NO);
+            confirm.setHeaderText(null);
+            Optional<ButtonType> res = confirm.showAndWait();
+            if (res.isPresent() && res.get() == ButtonType.YES) {
+                try {
+                    CVDao dao = new CVDao();
+                    boolean deleted = dao.deleteCV(s.getId());
+                    if (deleted) {
+                        thumbnailsPane.getChildren().remove(box);
+                        Alert info = new Alert(Alert.AlertType.INFORMATION, "CV deleted.", ButtonType.OK);
+                        info.setHeaderText(null);
+                        info.showAndWait();
+                    } else {
+                        Alert warn = new Alert(Alert.AlertType.WARNING, "Failed to delete CV.", ButtonType.OK);
+                        warn.setHeaderText(null);
+                        warn.showAndWait();
                     }
-                    FXMLLoader loader = new FXMLLoader(res);
+                } catch (Exception ex) {
+                    Alert a = new Alert(Alert.AlertType.ERROR, "Failed to delete CV: " + ex.getMessage(), ButtonType.OK);
+                    a.setHeaderText("Error");
+                    a.showAndWait();
+                }
+            }
+        });
+        box.setOnMouseClicked(evt -> {
+            evt.consume();
+            try {
+                CVDao dao = new CVDao();
+                var opt = dao.getCV(s.getId());
+                if (opt.isPresent()) {
+                    CVData cv = opt.get();
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("CV.fxml"));
                     Parent root = loader.load();
                     showCV controller = loader.getController();
                     controller.displayCV(cv);
@@ -105,12 +171,7 @@ public class HomeController implements Initializable {
     @FXML
     public void gotoForm(ActionEvent actionEvent) {
         try {
-            URL res = getClass().getResource("update-info.fxml");
-            if (res == null) {
-                System.err.println("Resource update-info.fxml not found on classpath.");
-                return;
-            }
-            Parent root = FXMLLoader.load(res);
+            Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("update-info.fxml")));
             Stage stage = (Stage) ((Node) actionEvent.getSource()).getScene().getWindow();
             switchScene(stage,root,"UpdateInfo.fxml");
         } catch (IOException e) {

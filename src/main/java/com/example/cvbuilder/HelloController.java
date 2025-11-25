@@ -22,12 +22,15 @@ import java.io.File;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+
+import static com.example.cvbuilder.SceneUtils.switchScene;
 
 public class HelloController implements Initializable {
     @FXML
@@ -288,12 +291,6 @@ public class HelloController implements Initializable {
         }
     }
 
-    /**
-     * Copy the selected image file into the project's resource images folder:
-     * src/main/resources/com/example/cvbuilder/images
-     * Returns the classpath-relative path (e.g. "images/123_filename.png") that can be used
-     * with getResource("/com/example/cvbuilder/" + relativePath), or null if the copy failed.
-     */
     private String copyImageToProject(String sourceAbsolutePath) {
         if (sourceAbsolutePath == null) return null;
         try {
@@ -311,9 +308,8 @@ public class HelloController implements Initializable {
             Path dest = imagesPath.resolve(destFileName);
 
             Files.copy(src, dest, StandardCopyOption.REPLACE_EXISTING);
-            String rel = "images/" + destFileName;
             System.out.println("Copied image to resources: " + dest.toAbsolutePath());
-            return rel.replace('\\', '/');
+            return projectDir.relativize(dest).toString().replace('\\', '/');
         } catch (IOException ioe) {
 
             return null;
@@ -605,6 +601,26 @@ public class HelloController implements Initializable {
         alert.showAndWait();
     }
 
+    @FXML
+    public void handleCancel(ActionEvent event) throws IOException, SQLException {
+        if(editingCV!=null && editingCV.getId()!=null){
+            CVDao dao = new CVDao();
+            var opt = dao.getCV(editingCV.getId());
+            if (opt.isPresent()) {
+                CVData cv = opt.get();
+                FXMLLoader loader=new FXMLLoader(getClass().getResource("CV.fxml"));
+                Parent root = loader.load();
+                showCV controller = loader.getController();
+                controller.displayCV(cv);
+                Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                switchScene(stage, root, "CV Preview");
+            }
+        }
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("Home.fxml")));
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        SceneUtils.switchScene(stage, root, "Home");
+    }
+
     public void loadCVData(CVData cv) {
         if (cv == null) return;
         this.editingCV = cv;
@@ -615,18 +631,19 @@ public class HelloController implements Initializable {
         if (addressField != null) addressField.setText(cv.getAddress());
         if (skillsField != null) skillsField.setText(cv.getSkills());
 
-        // load image if path present
-        if (cv.getProfileImagePath() != null && imageSelect != null) {
-            try {
-                File f = new File(cv.getProfileImagePath());
-                if (f.exists()) {
-                    imageSelect.setImage(new Image(f.toURI().toString()));
-                } else {
-                    var is = getClass().getResourceAsStream((cv.getProfileImagePath().startsWith("/") ? cv.getProfileImagePath() : "/com/example/cvbuilder/" + cv.getProfileImagePath()));
-                    if (is != null) imageSelect.setImage(new Image(is));
-                }
-            } catch (Exception e) {
-                // ignore loading errors
+        if (cv.getProfileImage() != null && imageSelect != null) {
+            imageSelect.setImage(cv.getProfileImage());
+        } else if (cv.getProfileImagePath() != null && imageSelect != null) {
+            String p = cv.getProfileImagePath();
+            File f = new File(p);
+            if (!f.exists()) {
+                f = new File(System.getProperty("user.dir"), p);
+            }
+            if (f.exists()) {
+                imageSelect.setImage(new Image(f.toURI().toString()));
+            } else {
+                var is = getClass().getResourceAsStream((p.startsWith("/") ? p : "/com/example/cvbuilder/" + p));
+                if (is != null) imageSelect.setImage(new Image(is));
             }
         }
 
@@ -635,7 +652,6 @@ public class HelloController implements Initializable {
             if (cv.getEducationList() != null && !cv.getEducationList().isEmpty()) {
                 for (CVData.Education e : cv.getEducationList()) {
                      VBox box = createRemovableEducationFields(eduBox, true);
-                     // set values
                      for (Node n : box.getChildren()) {
                          if (n instanceof TextField tf) {
                              if ("school".equals(tf.getUserData())) tf.setText(e.getSchool());

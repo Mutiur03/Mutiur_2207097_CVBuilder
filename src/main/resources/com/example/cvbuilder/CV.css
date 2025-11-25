@@ -65,3 +65,29 @@
     -fx-border-radius: 5;
     -fx-background-radius: 5;
 }
+
+.button-row {
+    -fx-alignment: center;
+}
+.action-button {
+    -fx-font-size: 14px;
+    -fx-padding: 10 20 10 20;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+}
+.home-button {
+    -fx-background-color: #2ecc71;
+    -fx-text-fill: white;
+}
+.home-button:hover {
+    -fx-background-color: #27ae60;
+}
+.edit-button {
+    -fx-background-color: #f39c12;
+    -fx-text-fill: white;
+}
+.edit-button:hover {
+    -fx-background-color: #d68910;
+}

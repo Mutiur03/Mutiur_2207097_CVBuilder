@@ -11,6 +11,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -47,6 +48,9 @@ public class showCV {
     @FXML
     private Label skillsLabel;
 
+    @FXML
+    private HBox buttonRow;
+
     private CVData currentCV;
 
     public void displayCV(CVData cvData) {
@@ -65,16 +69,27 @@ public class showCV {
         skillsLabel.setText(defaultIfNull(cvData.getSkills()));
 
         Image img = null;
-        String p = cvData.getProfileImagePath();
-        if (p != null && !p.isBlank()) {
-            File f = new File(p);
-            if (f.exists()) {
-                img = new Image(f.toURI().toString());
-            }
-            else {
-                var is = getClass().getResourceAsStream((p.startsWith("/") ? p : "/com/example/cvbuilder/" + p));
-                if (is != null) {
-                    img = new Image(is);
+        if (cvData.getProfileImage() != null) {
+            img = cvData.getProfileImage();
+        } else {
+            String p = cvData.getProfileImagePath();
+            if (p != null && !p.isBlank()) {
+                File f = new File(p);
+                if (!f.exists()) f = new File(System.getProperty("user.dir"), p);
+
+                if (f.exists()) {
+                    img = new Image(f.toURI().toString());
+                } else {
+                    String resourcePath = p;
+                    String resourcesPrefix = "src/main/resources/";
+                    if (resourcePath.startsWith(resourcesPrefix)) {
+                        resourcePath = resourcePath.substring(resourcesPrefix.length());
+                    }
+                    if (!resourcePath.startsWith("/")) resourcePath = "/" + resourcePath;
+                    var is = getClass().getResourceAsStream(resourcePath);
+                    if (is != null) {
+                        img = new Image(is);
+                    }
                 }
             }
         }
@@ -192,7 +207,6 @@ public class showCV {
                         row++;
                     }
 
-                    // Build duration string
                     StringBuilder dateRangeBuilder = new StringBuilder();
                     if (exp.getStartDate() != null && !exp.getStartDate().trim().isEmpty()) {
                         dateRangeBuilder.append(exp.getStartDate());
@@ -342,7 +356,6 @@ public class showCV {
             Parent root = fxmlLoader.load();
             Object controller = fxmlLoader.getController();
             if (controller instanceof HelloController) {
-                // ensure the editor is pre-populated with the current CV data
                 HelloController helloCtrl = (HelloController) controller;
                 helloCtrl.loadCVData(currentCV);
             }
@@ -351,6 +364,20 @@ public class showCV {
         } catch (IOException e) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to open editor for editing: " + e.getMessage(), javafx.scene.control.ButtonType.OK);
             alert.setHeaderText("Open Editor Error");
+            alert.showAndWait();
+        }
+    }
+
+    @FXML
+    public void goHome(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("Home.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) ((Node)event.getSource()).getScene().getWindow();
+            SceneUtils.switchScene(stage, root, "Home");
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Failed to navigate to Home: " + e.getMessage(), javafx.scene.control.ButtonType.OK);
+            alert.setHeaderText("Navigation Error");
             alert.showAndWait();
         }
     }
